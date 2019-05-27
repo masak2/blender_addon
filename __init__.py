@@ -86,19 +86,6 @@ else:
     from . import VIEW3D_tools_varioushelper
 
 import bpy
-# アドオンのクラス
-class AddSphere(bpy.types.Operator):
-    bl_idname = "add_sphere_object.button" # ID
-    bl_label = "Add Sphere" # メニューに追加されるラベル
-    bl_description = "Add Sphere" # 関数の説明
-    bl_options = {'REGISTER', 'UNDO'} # 処理の属性
-
-    def execute(self, context):
-        bpy.ops.mesh.primitive_ico_sphere_add()
-        print("Add Sphere End") # コンソールにログ出力
-        self.report({'INFO'}, "Add Sphere End")
-        return {'FINISHED'}
-
 
 #def menu_func(self, context):
 #    self.layout.operator(io_export_colour_layout_png.CMskExportColorLayoutPng.bl_idname)

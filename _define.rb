@@ -1,0 +1,1 @@
+$cmn_program = ENV['CMN_PROGRAM']
