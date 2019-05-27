@@ -8,6 +8,10 @@ class MskGenerateCtrBones(bpy.types.Operator):
     bl_label = "msk_gen_ctr_bones"
     bl_description = "Create controll bones"
     bl_context = "objectmode"
+
+    specialBones = ["Root", "Position", "Global"]
+    defBoneKeywords = ["J_", "HairJoint"]
+
     def execute(self, context):
         print("MskGenerateCtrBones")
         obj = bpy.context.object
@@ -15,7 +19,7 @@ class MskGenerateCtrBones(bpy.types.Operator):
 
         new_bonename_arr = []
         for bone in armobj.bones:
-            if bone.name.startswith("def_") or bone.name == "root":
+            if self.isDeformBone(bone.name):
                 
                 ctr_bone_name = self.get_ctr_bonename(bone.name)
                 if False == self.exists(armobj.bones, ctr_bone_name):
@@ -26,11 +30,11 @@ class MskGenerateCtrBones(bpy.types.Operator):
         for bonename in new_bonename_arr:
             bone = armobj.edit_bones.new('Bone')
             bone.name = bonename
-        
+            print(bonename)
 
         #tweak
         for def_bone in armobj.edit_bones:
-            if def_bone.name.startswith("def_") or def_bone.name == "root":
+            if self.isDeformBone(def_bone.name):
                 ctr_bone_name = self.get_ctr_bonename(def_bone.name)
                 ctr_bone = self.find_bone(armobj.edit_bones, ctr_bone_name)
                 ctr_bone.head = def_bone.head
@@ -48,7 +52,7 @@ class MskGenerateCtrBones(bpy.types.Operator):
 
         bpy.ops.object.mode_set(mode='POSE')
         for posebone in obj.pose.bones:
-            if posebone.name.startswith("def_") or posebone.name == "root":
+            if self.isDeformBone(posebone.name):
 
                 bpy.ops.pose.select_all(action='DESELECT')
                 armobj.bones.active = posebone.bone
@@ -66,6 +70,16 @@ class MskGenerateCtrBones(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='OBJECT')
         return{'FINISHED'}
         
+    def isDeformBone(self, bonename):
+        for key in self.defBoneKeywords:
+            if bonename.startswith(key):
+                return True
+
+        for specialBone in self.specialBones:
+            if bonename == specialBone:
+                return True
+
+        return False
 
     def exists(self, bones, bone_name):
         for bone in bones:
@@ -78,7 +92,4 @@ class MskGenerateCtrBones(bpy.types.Operator):
                 return bone
         return None
     def get_ctr_bonename(self, def_bonename):
-        if def_bonename == "root":
-            return "ctr_root"
-        else:
-            return "ctr_" + def_bonename[4:]
+        return "Ctr_" + def_bonename
