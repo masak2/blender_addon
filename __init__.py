@@ -3,11 +3,9 @@ bl_info = {
     "author": "Masashi Kamiyama( masak )",
     "version": (1,0),
     "blender": (2, 80, 0),
-    "api": 35853,
     "location": "View3D > Tool Shelf > Masak VariousHelper",
     "description": "various helper class and method for various projects",
     "warning": "",
-
     "wiki_url": "http://wiki.blender.org/index.php/Extensions:2.5/Py/"\
         "Scripts/Object/Cloud_Gen",
     "tracker_url": "https://projects.blender.org/tracker/index.php?"\

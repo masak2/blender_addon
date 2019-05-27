@@ -9,7 +9,7 @@ class MskGenerateCtrBones(bpy.types.Operator):
     bl_description = "Create controll bones"
     bl_context = "objectmode"
     def execute(self, context):
-
+        print("MskGenerateCtrBones")
         obj = bpy.context.object
         armobj = obj.data
 
@@ -21,6 +21,7 @@ class MskGenerateCtrBones(bpy.types.Operator):
                 if False == self.exists(armobj.bones, ctr_bone_name):
                     new_bonename_arr.append(ctr_bone_name)
         
+
         bpy.ops.object.mode_set(mode='EDIT')
         for bonename in new_bonename_arr:
             bone = armobj.edit_bones.new('Bone')
