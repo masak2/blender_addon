@@ -1,5 +1,6 @@
 import bpy
 import mathutils
+import math
 #///////////////////////////////////////////////////////////////////////////////
 #   
 #///////////////////////////////////////////////////////////////////////////////
@@ -12,6 +13,7 @@ class MskGenerateLegRig(bpy.types.Operator):
     legRigBoneNames = ["ik_foot_","pole_knee_", "mch_foot_", "mch_toe_", "mch_ball_", "mch_heel_", "ctr_roll_"]
     legRelatedBoneTable = {}
     armobj = None
+    pole_angle = {}
 
     def execute(self, context):
         print("MskGenerateLegRig")
@@ -24,8 +26,13 @@ class MskGenerateLegRig(bpy.types.Operator):
             if value != "none":
                 self.legRelatedBoneTable[value] = bone.name
                 print(value + "=" + bone.name)
+
+
             
         bpy.ops.object.mode_set(mode='EDIT')
+
+        self.pole_angle["legL"] = self.findBoneByKeyword("legL").get("pole_angle", 0.0)
+        self.pole_angle["legR"] = self.findBoneByKeyword("legR").get("pole_angle", 0.0)
         self.createBonesIfNone("L")
         self.createBonesIfNone("R")
         
@@ -33,42 +40,12 @@ class MskGenerateLegRig(bpy.types.Operator):
         # ik
         self.tweakEditBones("L")
         self.tweakEditBones("R")
-        return{'FINISHED'}
-        #tweak
-        for def_bone in self.armobj.edit_bones:
-            if self.isDeformBone(def_bone.name):
-                ctr_bone_name = self.get_ctr_bonename(def_bone.name)
-                ctr_bone = self.find_bone(armobj.edit_bones, ctr_bone_name)
-                ctr_bone.head = def_bone.head
-                ctr_bone.tail = def_bone.tail
-                ctr_bone.roll = def_bone.roll
-                ctr_bone.use_deform = False
 
-                if def_bone.parent != None:
-                    parent_bone_name = self.get_ctr_bonename(def_bone.parent.name)
-                    ctr_bone.parent = self.find_bone(armobj.edit_bones, parent_bone_name)
-                else:
-                    ctr_bone.parent = None
-        
         bpy.ops.object.mode_set(mode='OBJECT')
 
         bpy.ops.object.mode_set(mode='POSE')
-        for posebone in obj.pose.bones:
-            if self.isDeformBone(posebone.name):
-
-                bpy.ops.pose.select_all(action='DESELECT')
-                armobj.bones.active = posebone.bone
-
-                idx = posebone.constraints.find('Copy Transforms')
-                if idx == -1:
-                    bpy.ops.pose.constraint_add(type='COPY_TRANSFORMS')
-
-                const = posebone.constraints['Copy Transforms']
-
-                const.target = obj
-                const.subtarget = self.get_ctr_bonename(posebone.name)
-                
-
+        self.addConstraintsIfNeed("L")
+        self.addConstraintsIfNeed("R")
         bpy.ops.object.mode_set(mode='OBJECT')
         return{'FINISHED'}
 
@@ -142,11 +119,26 @@ class MskGenerateLegRig(bpy.types.Operator):
         srcBone = self.findBoneByKeyword("foot"+postfix)
         targetBone = self.findBone("ctr_roll_"+postfix)
         targetBone.head = srcBone.head
-        targetBone.head[1] + 0.1
+        targetBone.head[1] += 0.1
         targetBone.tail = targetBone.head
         targetBone.tail[1] += 0.1
         targetBone.use_deform = False
         targetBone.parent = self.findBone("ik_foot_"+postfix)
+
+    def addConstraintsIfNeed(self, postfix):
+        obj = bpy.context.object
+        # IK
+        posebone = self.findPoseBoneByKeyword("leg" + postfix)
+        self.safeSelectPoseBone(posebone)
+        const = self.safeFindConstraint(posebone,'IK')
+        const.target = obj
+        const.subtarget = "ik_foot_"+postfix
+        const.pole_target = obj
+        const.pole_subtarget = "pole_knee_"+postfix
+        const.chain_count = 2
+        const.pole_angle =  self.pole_angle["leg" + postfix] / 180.0 * math.pi
+        posebone.lock_ik_y = True
+        posebone.lock_ik_z = True
 
 
     def existsBone(self, bonename):
@@ -165,3 +157,26 @@ class MskGenerateLegRig(bpy.types.Operator):
         bonename = self.legRelatedBoneTable[keyword]
         return self.findBone(bonename)
 
+    def safeSelectPoseBone(self, posebone):
+        bpy.ops.pose.select_all(action='DESELECT')
+
+        
+        self.armobj.bones.active = posebone.bone
+
+    def safeFindConstraint(self, posebone, key):
+        idx = posebone.constraints.find(key)
+        if idx == -1:
+            bpy.ops.pose.constraint_add(type=key)
+
+        return posebone.constraints[key]
+
+    def findPoseBone(self, bonename):
+        for bone in bpy.context.object.pose.bones:
+            if bone.name == bonename:
+                return bone
+            
+        print("no pose bone=" + bonename)
+        return None
+    def findPoseBoneByKeyword(self, keyword):
+        bonename = self.legRelatedBoneTable[keyword]
+        return self.findPoseBone(bonename)
