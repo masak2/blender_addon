@@ -41,7 +41,7 @@ if "bpy" in locals():
     imp.reload(msh_mirror_vertex_group)
     imp.reload(msh_remove_all_r_vertexgroup)
     imp.reload(obj_generate_ctr_bones)
-    imp.reload(obj_generate_merged_hair)
+    imp.reload(obj_generate_leg_rig)
     imp.reload(obj_generate_skirt_bone)
     imp.reload(obj_generate_skirt_mesh)
     imp.reload(obj_remove_ignoreautoweight_vg)
@@ -72,7 +72,7 @@ else:
     from . import msh_mirror_vertex_group
     from . import msh_remove_all_r_vertexgroup
     from . import obj_generate_ctr_bones
-    from . import obj_generate_merged_hair
+    from . import obj_generate_leg_rig
     from . import obj_generate_skirt_bone
     from . import obj_generate_skirt_mesh
     from . import obj_remove_ignoreautoweight_vg
@@ -91,6 +91,7 @@ import bpy
 # クラスをまとめる
 classes = (
     obj_generate_ctr_bones.MskGenerateCtrBones,
+    obj_generate_leg_rig.MskGenerateLegRig,
 )
 
 # まとめたクラスを一度に登録
