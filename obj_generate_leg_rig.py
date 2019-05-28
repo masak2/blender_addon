@@ -67,6 +67,7 @@ class MskGenerateLegRig(bpy.types.Operator):
         targetBone.tail[2] += -0.2
         targetBone.use_deform = False
         targetBone.parent = self.findBoneByKeyword("root")
+        self.setLayer(targetBone, 0)
 
         srcBone = self.findBoneByKeyword("leg"+postfix)
         targetBone = self.findBone("pole_knee_"+postfix)
@@ -76,11 +77,13 @@ class MskGenerateLegRig(bpy.types.Operator):
         targetBone.tail[1] += -0.5
         targetBone.use_deform = False
         targetBone.parent = self.findBoneByKeyword("root")
+        self.setLayer(targetBone, 0)
 
         srcBone = self.findBoneByKeyword("foot"+postfix)
         targetBone = self.findBone("mch_foot_"+postfix)
         targetBone.head = srcBone.head
         targetBone.tail = srcBone.tail
+        targetBone.roll = srcBone.roll
         targetBone.use_deform = False
         targetBone.parent = self.findBone("mch_ball_"+postfix)
 
@@ -88,6 +91,7 @@ class MskGenerateLegRig(bpy.types.Operator):
         targetBone = self.findBone("mch_toe_"+postfix)
         targetBone.head = srcBone.head
         targetBone.tail = srcBone.tail
+        targetBone.roll = srcBone.roll
         targetBone.use_deform = False
         targetBone.parent = self.findBone("mch_heel_"+postfix)
 
@@ -124,15 +128,16 @@ class MskGenerateLegRig(bpy.types.Operator):
         targetBone.tail[1] += 0.1
         targetBone.use_deform = False
         targetBone.parent = self.findBone("ik_foot_"+postfix)
+        self.setLayer(targetBone, 0)
 
     def addConstraintsIfNeed(self, postfix):
         obj = bpy.context.object
         # IK
         posebone = self.findPoseBoneByKeyword("leg" + postfix)
         self.safeSelectPoseBone(posebone)
-        const = self.safeFindConstraint(posebone,'IK')
+        const = self.safeFindConstraint(posebone,'IK', "IK")
         const.target = obj
-        const.subtarget = "ik_foot_"+postfix
+        const.subtarget = "mch_foot_"+postfix
         const.pole_target = obj
         const.pole_subtarget = "pole_knee_"+postfix
         const.chain_count = 2
@@ -140,6 +145,80 @@ class MskGenerateLegRig(bpy.types.Operator):
         posebone.lock_ik_y = True
         posebone.lock_ik_z = True
 
+        # ctr foot
+        posebone = self.findPoseBoneByKeyword("foot" + postfix)
+        self.safeSelectPoseBone(posebone)
+        const = self.safeFindConstraint(posebone,'COPY_TRANSFORMS', "Copy Transforms")
+        const.target = obj
+        const.subtarget = "mch_foot_" + postfix
+        # Space はworld worldになってるはず
+
+        # ctr toe
+        posebone = self.findPoseBoneByKeyword("toe" + postfix)
+        self.safeSelectPoseBone(posebone)
+        const = self.safeFindConstraint(posebone,'COPY_TRANSFORMS', "Copy Transforms")
+        const.target = obj
+        const.subtarget = "mch_toe_" + postfix
+        # Space はworld worldになってるはず
+
+        # mch ball
+        posebone = self.findPoseBone("mch_ball_" + postfix)
+        self.safeSelectPoseBone(posebone)
+        const = self.safeFindConstraint(posebone,'COPY_ROTATION', "Copy Rotation")
+        const.target = obj
+        const.subtarget = "ctr_roll_" + postfix
+        const.use_x = True
+        const.use_y = False
+        const.use_z = False
+        const.target_space = 'LOCAL'
+        const.owner_space =  'LOCAL'
+        const = self.safeFindConstraint(posebone, 'LIMIT_ROTATION', "Limit Rotation")
+        const.use_limit_x = True
+        const.use_limit_y = False
+        const.use_limit_z = False
+        const.min_x = 0
+        const.max_x = self.convertRadian(90)
+        const.owner_space =  'LOCAL'
+
+        # mch heel
+        posebone = self.findPoseBone("mch_heel_" + postfix)
+        self.safeSelectPoseBone(posebone)
+        const = self.safeFindConstraint(posebone,'COPY_ROTATION', "Copy Rotation")
+        const.target = obj
+        const.subtarget = "ctr_roll_" + postfix
+        const.use_x = True
+        const.use_y = True
+        const.use_z = True
+        const.invert_x = True
+        const.target_space = 'LOCAL'
+        const.owner_space =  'LOCAL'
+        const = self.safeFindConstraint(posebone, 'LIMIT_ROTATION', "Limit Rotation")
+        const.use_limit_x = True
+        const.use_limit_y = False
+        const.use_limit_z = False
+        const.min_x = 0
+        const.max_x = self.convertRadian(90)
+        const.use_transform_limit = True
+        const.owner_space =  'LOCAL'
+
+        # ctr roll
+        posebone = self.findPoseBone("ctr_roll_" + postfix)
+        self.safeSelectPoseBone(posebone)
+        const = self.safeFindConstraint(posebone, 'LIMIT_ROTATION', "Limit Rotation")
+        const.use_limit_x = True
+        const.use_limit_y = True
+        const.use_limit_z = True
+        const.min_x = self.convertRadian(-30)
+        const.max_x = self.convertRadian(60)
+        # 他のmin maxはdefault 0
+        const.owner_space =  'LOCAL'
+
+    # もしかしたら将来的に指定idにのみ存在させるかも
+    def setLayer(self, editBone, id):
+        editBone.layers[id] = True
+
+    def convertRadian(self, angle):
+        return angle / 180.0 * math.pi
 
     def existsBone(self, bonename):
         for bone in self.armobj.bones:
@@ -163,12 +242,12 @@ class MskGenerateLegRig(bpy.types.Operator):
         
         self.armobj.bones.active = posebone.bone
 
-    def safeFindConstraint(self, posebone, key):
-        idx = posebone.constraints.find(key)
+    def safeFindConstraint(self, posebone, key, constname):
+        idx = posebone.constraints.find(constname)
         if idx == -1:
             bpy.ops.pose.constraint_add(type=key)
 
-        return posebone.constraints[key]
+        return posebone.constraints[constname]
 
     def findPoseBone(self, bonename):
         for bone in bpy.context.object.pose.bones:
