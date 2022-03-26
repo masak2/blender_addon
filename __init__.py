@@ -41,10 +41,14 @@ if "bpy" in locals():
     imp.reload(msh_mirror_vertex_group)
     imp.reload(msh_remove_all_r_vertexgroup)
     imp.reload(obj_generate_ctr_bones)
+    imp.reload(obj_generate_ctr_bones_selected)
     imp.reload(obj_generate_leg_rig)
     imp.reload(obj_generate_skirt_bone)
     imp.reload(obj_generate_skirt_mesh)
+    imp.reload(obj_generate_shapekey_bones)
     imp.reload(obj_remove_ignoreautoweight_vg)
+    imp.reload(obj_rename_bones_vroid_to_bl)
+    imp.reload(obj_rename_groups_vroid_to_bl)
     imp.reload(util_count_bone)
     imp.reload(util_export_project_fbx)
     imp.reload(util_various)
@@ -72,10 +76,14 @@ else:
     from . import msh_mirror_vertex_group
     from . import msh_remove_all_r_vertexgroup
     from . import obj_generate_ctr_bones
+    from . import obj_generate_ctr_bones_selected
     from . import obj_generate_leg_rig
     from . import obj_generate_skirt_bone
     from . import obj_generate_skirt_mesh
+    from . import obj_generate_shapekey_bones
     from . import obj_remove_ignoreautoweight_vg
+    from . import obj_rename_bones_vroid_to_bl
+    from . import obj_rename_groups_vroid_to_bl
     from . import util_count_bone
     from . import util_export_project_fbx
     from . import util_various
@@ -91,7 +99,12 @@ import bpy
 # クラスをまとめる
 classes = (
     obj_generate_ctr_bones.MskGenerateCtrBones,
+    obj_generate_ctr_bones_selected.MskGenerateCtrBonesSelected,
     obj_generate_leg_rig.MskGenerateLegRig,
+    obj_generate_shapekey_bones.MskGenerateShapeKeyBones,
+    obj_rename_bones_vroid_to_bl.MskRenameBonesVroidToBL,
+    obj_rename_groups_vroid_to_bl.MskRenameGroupsVroidToBL,
+
 )
 
 # まとめたクラスを一度に登録
