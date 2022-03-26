@@ -233,6 +233,10 @@ class MskGenerateLegRig(bpy.types.Operator):
         print("no bone=" + bonename)
         return None
     def findBoneByKeyword(self, keyword):
+        # error文を
+        if not keyword in self.legRelatedBoneTable:
+            print("no rig_info value=" + keyword)
+
         bonename = self.legRelatedBoneTable[keyword]
         return self.findBone(bonename)
 
