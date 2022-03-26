@@ -70,20 +70,7 @@ class MskGenerateShapeKeyBones(bpy.types.Operator):
         self.remove_driver_bones(objArmature)
         return{'FINISHED'}
 
-    def find_face_obj(self):
-    	for obj in bpy.data.objects:
-            ignore = False
-            for ignore_key in self.ignore_keys:
-                if obj.name.find(ignore_key) != -1:
-                    ignore = True
 
-            if ignore:
-                continue
-            if "Face" in obj.name:
-                return obj
-            if "face" in obj.name:
-                return obj
-    	return nil
 
     def add_driver_bones(self, objArmature):
         self.useless_driver_bones = set()
