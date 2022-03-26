@@ -9,7 +9,7 @@ class MskGenerateShapeKeyBones(bpy.types.Operator):
     bl_description = "sync control bones to shapekeys"
     bl_context = "objectmode"
 
-    ignore_keys = {"Dummy", "damy", "Basis", "m_", "vrc_", "b_"}
+    ignore_keys = {"Dummy", "damy", "Basis", "m_", "vrc_", "b_", "**"}
 
     kDeformPrefix = "cc_d_Driver_"
     kControlPrefix = "c_Driver_"
