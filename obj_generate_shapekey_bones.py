@@ -64,7 +64,6 @@ class MskGenerateShapeKeyBones(bpy.types.Operator):
             
             index += 1
             self.generate_driver_bones(kb, index,shapke_key_idx, objArmature)
-
             
 
         self.remove_driver_bones(objArmature)
@@ -120,9 +119,9 @@ class MskGenerateShapeKeyBones(bpy.types.Operator):
 
     def generate_driver_bones(self, key_block, index, shapke_key_idx, objArmature):
         armature = objArmature.data
-        #suffix = str(shapke_key_idx).zfill(2) useless
-        def_bone_name = self.kDeformPrefix + key_block.name # to avoid x axis mirror
-        ctr_bone_name = self.kControlPrefix + key_block.name
+        suffix = str(shapke_key_idx).zfill(3)
+        def_bone_name = self.kDeformPrefix + key_block.name + suffix # to avoid x axis mirror
+        ctr_bone_name = self.kControlPrefix + key_block.name + suffix
 
         
                 
@@ -133,18 +132,20 @@ class MskGenerateShapeKeyBones(bpy.types.Operator):
         self.safe_remove_from_useless_driver_bones(def_bone_name)
         self.safe_remove_from_useless_driver_bones(ctr_bone_name)
        
-        x = index // 10
-        z = index % 10
-        def_bone.head.x = x * 0.25
-        def_bone.head.z = 2.0 + z * 0.05
-        def_bone.tail.x = def_bone.head.x
-        def_bone.tail.z = def_bone.head.z + 0.03
+        x = index // 20
+        z = index % 20
+
+        
+        def_bone.head = [x * 0.25, 0, 2.0 + z * 0.05]
+        def_bone.tail = [def_bone.head.x, 0, def_bone.head.z + 0.03]
         def_bone.roll = 0.0
         def_bone.parent = armature.edit_bones[self.kDeformPrefix+"Root"]
         def_bone.use_deform = True
-        
-        ctr_bone.head = def_bone.head
-        ctr_bone.tail = def_bone.tail
+
+        head = def_bone.head
+        ctr_bone.head = [head.x, head.y, head.z]
+        tail = def_bone.tail
+        ctr_bone.tail = [tail.x, tail.y, tail.z]
         ctr_bone.roll = def_bone.roll
         ctr_bone.parent = armature.edit_bones[self.kControlPrefix+"Root"]
         ctr_bone.use_deform = False
@@ -259,11 +260,11 @@ class MskGenerateShapeKeyBones(bpy.types.Operator):
 
 
     def set_bone_layer(self, bone_name, idx, armature):
+        armature.bones[bone_name].layers[idx] = True
         for i in range(32):
-            b = False
             if i == idx:
-                b = True
-            armature.bones[bone_name].layers[i] = b
+                continue
+            armature.bones[bone_name].layers[i] = False
 
 
     def find_or_create_constraint(self, target, constraint_name, constraint_type):
