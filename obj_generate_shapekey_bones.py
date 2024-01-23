@@ -9,7 +9,7 @@ class MskGenerateShapeKeyBones(bpy.types.Operator):
     bl_description = "sync control bones to shapekeys"
     bl_context = "objectmode"
 
-    ignore_keys = {"Dummy", "damy", "Basis", "m_", "vrc_", "b_", "**", "Basic"}
+    ignore_keys = {"Dummy", "damy", "Basis", "vrc_", "**", "Basic"}
 
     kDeformPrefix = "cc_d_Driver_"
     kControlPrefix = "c_Driver_"
@@ -115,8 +115,8 @@ class MskGenerateShapeKeyBones(bpy.types.Operator):
         
 
         bpy.ops.object.mode_set(mode='OBJECT')
-        self.set_bone_layer(def_driver_root_name, 31, armature)
-        self.set_bone_layer(ctr_driver_root_name, 30, armature)
+        self.set_bone_layer(def_driver_root_name, "DeformBlendShape", armature)
+        self.set_bone_layer(ctr_driver_root_name, "Control", armature)
 
     def generate_driver_bones(self, key_block, index, shapke_key_idx, objArmature):
         armature = objArmature.data
@@ -153,8 +153,8 @@ class MskGenerateShapeKeyBones(bpy.types.Operator):
         
         bpy.ops.object.mode_set(mode='OBJECT')
         
-        self.set_bone_layer(def_bone_name, 31, armature)
-        self.set_bone_layer(ctr_bone_name, 16, armature)
+        self.set_bone_layer(def_bone_name, "DeformBlendShape", armature)
+        self.set_bone_layer(ctr_bone_name, "SecondaryControl", armature)
         
         
         bpy.ops.object.mode_set(mode='POSE')
@@ -265,12 +265,11 @@ class MskGenerateShapeKeyBones(bpy.types.Operator):
 
 
 
-    def set_bone_layer(self, bone_name, idx, armature):
-        armature.bones[bone_name].layers[idx] = True
-        for i in range(32):
-            if i == idx:
-                continue
-            armature.bones[bone_name].layers[i] = False
+    def set_bone_layer(self, bone_name, collection_name, armature):
+        bone = armature.bones[bone_name]
+        for col in armature.collections:
+            col.unassign(bone)
+        armature.collections[collection_name].assign(bone)
 
 
     def find_or_create_constraint(self, target, constraint_name, constraint_type):
