@@ -26,19 +26,18 @@ if "bpy" in locals():
     imp.reload(obj_generate_ctr_bones_selected)
     imp.reload(obj_generate_shapekey_bones)
 
-    imp.reload(VIEW3D_tools_varioushelper)
 
 else:
     print("import masak general addon")
     from . import obj_generate_ctr_bones_selected
     from . import obj_generate_shapekey_bones
 
-    from . import VIEW3D_tools_varioushelper
 
 import bpy
 
-#def menu_func(self, context):
-#    self.layout.operator(io_export_colour_layout_png.CMskExportColorLayoutPng.bl_idname)
+def menu_func(self, context):
+    self.layout.operator(obj_generate_ctr_bones_selected.MskGenerateCtrBonesSelected.bl_idname, text="Masak Gen Ctr Bones")
+    self.layout.operator(obj_generate_shapekey_bones.MskGenerateShapeKeyBones.bl_idname, text="Masak Gen ShapeKey Bones")
 
 # クラスをまとめる
 classes = (
@@ -47,9 +46,18 @@ classes = (
 
 )
 
-# まとめたクラスを一度に登録
-register, unregister = bpy.utils.register_classes_factory(classes)
+# まとめたクラスを一度に登録 4.0だとF3 Serachに出ない…
+#register, unregister = bpy.utils.register_classes_factory(classes)
 
+def register():
+    bpy.utils.register_class(obj_generate_ctr_bones_selected.MskGenerateCtrBonesSelected)
+    bpy.utils.register_class(obj_generate_shapekey_bones.MskGenerateShapeKeyBones)
+    bpy.types.VIEW3D_MT_object.append(menu_func)
+
+def unregister():
+    bpy.utils.unregister_class(obj_generate_ctr_bones_selected.MskGenerateCtrBonesSelected)
+    bpy.utils.unregister_class(obj_generate_shapekey_bones.MskGenerateShapeKeyBones)
+    bpy.types.VIEW3D_MT_object.remove(menu_func)
 
 if __name__ == "__main__":
     register()
