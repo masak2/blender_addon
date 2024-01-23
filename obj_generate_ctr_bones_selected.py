@@ -7,7 +7,6 @@ class MskGenerateCtrBonesSelected(bpy.types.Operator):
     bl_idname = "masak.msk_gen_ctr_bones_selected"
     bl_label = "msk_gen_ctr_bones_selected"
     bl_description = "Create controll bones for selected bones"
-    bl_context = "objectmode"
 
     def execute(self, context):
         print("MskGenerateCtrBones")
@@ -16,9 +15,10 @@ class MskGenerateCtrBonesSelected(bpy.types.Operator):
         
 
         selected_bonenames = []
-        for ebone in bpy.context.selected_bones:
-            selected_bonenames.append(ebone.name)
-            #print(ebone.name)
+        for bone in armobj.bones:
+            if bone.select:
+                selected_bonenames.append(bone.name)
+                #print(bone.name)
         new_bonename_arr = []
         for bonename in selected_bonenames:
             ctr_bone_name = self.get_ctr_bonename(bonename)
