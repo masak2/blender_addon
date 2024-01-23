@@ -5,7 +5,7 @@ require 'fileutils'
 require $cmn_program + '/ruby/file_copy.rb'
 
 
-dstDir = "C:/Users/LMisa/AppData/Roaming/Blender Foundation/Blender/2.80/scripts/addons/masak"
+dstDir = "C:/Users/LMisa/AppData/Roaming/Blender Foundation/Blender/4.00/scripts/addons/masak"
 
 
 

@@ -9,7 +9,7 @@ class MskGenerateShapeKeyBones(bpy.types.Operator):
     bl_description = "sync control bones to shapekeys"
     bl_context = "objectmode"
 
-    ignore_keys = {"Dummy", "damy", "Basis", "m_", "vrc_", "b_", "**"}
+    ignore_keys = {"Dummy", "damy", "Basis", "m_", "vrc_", "b_", "**", "Basic"}
 
     kDeformPrefix = "cc_d_Driver_"
     kControlPrefix = "c_Driver_"
@@ -67,6 +67,7 @@ class MskGenerateShapeKeyBones(bpy.types.Operator):
             
 
         self.remove_driver_bones(objArmature)
+
         return{'FINISHED'}
 
 
@@ -86,7 +87,7 @@ class MskGenerateShapeKeyBones(bpy.types.Operator):
         armature = objArmature.data
         bpy.ops.object.mode_set(mode='EDIT')
         for bonename in self.useless_driver_bones:
-            #print(bonename)
+            print("REMOVE:"+bonename)
             edtibone = armature.edit_bones[bonename]
             armature.edit_bones.remove(edtibone)
         bpy.ops.object.mode_set(mode='OBJECT')
@@ -99,7 +100,7 @@ class MskGenerateShapeKeyBones(bpy.types.Operator):
         def_driver_root.head = (0.0, 0, 1.9)
         def_driver_root.tail = (0.0, 0, 1.94)
         def_driver_root.use_deform = True
-        def_driver_root.parent = self.find_or_create_bone(self.kDefRootBone, armature)
+        #def_driver_root.parent = self.find_or_create_bone(self.kDefRootBone, armature)
         
 
         ctr_driver_root_name = self.kControlPrefix + "Root"
@@ -107,7 +108,7 @@ class MskGenerateShapeKeyBones(bpy.types.Operator):
         ctr_driver_root.head = def_driver_root.head
         ctr_driver_root.tail = def_driver_root.tail
         ctr_driver_root.use_deform = False
-        ctr_driver_root.parent = self.find_or_create_bone(self.kCtrRootBone, armature)
+        #ctr_driver_root.parent = self.find_or_create_bone(self.kCtrRootBone, armature)
 
         self.safe_remove_from_useless_driver_bones(def_driver_root_name)
         self.safe_remove_from_useless_driver_bones(ctr_driver_root_name)
@@ -119,7 +120,7 @@ class MskGenerateShapeKeyBones(bpy.types.Operator):
 
     def generate_driver_bones(self, key_block, index, shapke_key_idx, objArmature):
         armature = objArmature.data
-        suffix = str(shapke_key_idx).zfill(3)
+        suffix = "0"# str(shapke_key_idx).zfill(3) to avoid id missing
         def_bone_name = self.kDeformPrefix + key_block.name + suffix # to avoid x axis mirror
         ctr_bone_name = self.kControlPrefix + key_block.name + suffix
 
@@ -227,8 +228,10 @@ class MskGenerateShapeKeyBones(bpy.types.Operator):
         if bpy.data.curves.find(ctr_bone_name) == -1:
             text = bpy.data.curves.new(ctr_bone_name, 'FONT')
         text = bpy.data.curves[ctr_bone_name]
-        text.size = 0.04
+        text.size = 0.03
         text.body = key_block.name
+        fontidx = bpy.data.fonts.find("Yu Gothic Regular")
+        text.font = bpy.data.fonts[fontidx]
 
         if bpy.data.objects.find(ctr_bone_name)==-1:
             bpy.data.objects.new(ctr_bone_name, text)
@@ -247,6 +250,9 @@ class MskGenerateShapeKeyBones(bpy.types.Operator):
         collection = bpy.data.collections["ShapeKeyText"]
         if collection.objects.find(ctr_bone_name) == -1:
             collection.objects.link(objText)
+
+    def merge_curve_text(self, key_block):
+        return
 
 
         

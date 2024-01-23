@@ -10,7 +10,7 @@ class MskGenerateCtrBones(bpy.types.Operator):
     bl_context = "objectmode"
 
     specialBones = ["Root", "Position", "Global"]
-    defBoneKeywords = ["J_", "HairJoint"]
+    defBoneKeywords = ["D_", "HairJoint"]
 
     def execute(self, context):
         print("MskGenerateCtrBones")
@@ -43,8 +43,10 @@ class MskGenerateCtrBones(bpy.types.Operator):
                 ctr_bone.use_deform = False
 
                 if def_bone.parent != None:
-                    parent_bone_name = self.get_ctr_bonename(def_bone.parent.name)
-                    ctr_bone.parent = self.find_bone(armobj.edit_bones, parent_bone_name)
+                    exist = ctr_bone.get("not_parent_auto", 0.0)
+                    if exist == 0.0:
+                        parent_bone_name = self.get_ctr_bonename(def_bone.parent.name)
+                        ctr_bone.parent = self.find_bone(armobj.edit_bones, parent_bone_name)
                 else:
                     ctr_bone.parent = None
         
@@ -59,7 +61,9 @@ class MskGenerateCtrBones(bpy.types.Operator):
 
                 idx = posebone.constraints.find('Copy Transforms')
                 if idx == -1:
-                    bpy.ops.pose.constraint_add(type='COPY_TRANSFORMS')
+                    posebone.constraints.new('COPY_TRANSFORMS')
+
+                    #bpy.ops.pose.constraint_add(type='COPY_TRANSFORMS')
 
                 const = posebone.constraints['Copy Transforms']
 

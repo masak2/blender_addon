@@ -15,10 +15,13 @@ class MskGenerateCtrBonesSelected(bpy.types.Operator):
         armobj = obj.data
         
 
-        target_bones = bpy.context.selected_bones
+        selected_bonenames = []
+        for ebone in bpy.context.selected_bones:
+            selected_bonenames.append(ebone.name)
+            #print(ebone.name)
         new_bonename_arr = []
-        for bone in target_bones:
-            ctr_bone_name = self.get_ctr_bonename(bone.name)
+        for bonename in selected_bonenames:
+            ctr_bone_name = self.get_ctr_bonename(bonename)
             if False == self.exists(armobj.bones, ctr_bone_name):
                 new_bonename_arr.append(ctr_bone_name)
         
@@ -27,11 +30,12 @@ class MskGenerateCtrBonesSelected(bpy.types.Operator):
         for bonename in new_bonename_arr:
             bone = armobj.edit_bones.new('Bone')
             bone.name = bonename
-            print(bonename)
+            #print(bonename)
 
         #tweak
-        for def_bone in target_bones:
-            ctr_bone_name = self.get_ctr_bonename(def_bone.name)
+        for bonename in selected_bonenames:
+            def_bone = self.find_bone(armobj.edit_bones, bonename)
+            ctr_bone_name = self.get_ctr_bonename(bonename)
             ctr_bone = self.find_bone(armobj.edit_bones, ctr_bone_name)
             ctr_bone.head = def_bone.head
             ctr_bone.tail = def_bone.tail
@@ -49,10 +53,12 @@ class MskGenerateCtrBonesSelected(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='OBJECT')
 
         bpy.ops.object.mode_set(mode='POSE')
-        for deformbone in target_bones:
+       
+        for bonename in selected_bonenames:
 
             bpy.ops.pose.select_all(action='DESELECT')
-            posebone = self.find_bone(obj.pose.bones, deformbone.name)
+            posebone = self.find_bone(obj.pose.bones, bonename)
+            #print(bonename)
             armobj.bones.active = posebone.bone
 
             idx = posebone.constraints.find('Copy Transforms')
