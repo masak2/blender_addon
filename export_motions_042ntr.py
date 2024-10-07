@@ -17,6 +17,12 @@ def SafeSelectAndExport(rig_object_name, rig_name, filepath_key, anim_name_key):
 def SafeSelectAndExportKeiko(anim_name_key):
     SafeSelectAndExport("CGIR00100Teleclair_rig","ArmatureCGIR00100","CGIR00100", anim_name_key)
 
+def SafeSelectAndExportKazumiNormal(anim_name_key):
+    SafeSelectAndExport("CGIR00200Kazumi_rig","ArmatureCGIR00200","CGIR00200", anim_name_key)
+
+    def SafeSelectAndExportKazumiSaccubus(anim_name_key):
+    SafeSelectAndExport("CGIR00250_KazumiSaccubus_rig","ArmatureCGIR00250","CGIR00250", anim_name_key)
+
 def SafeSelectAndExportHero(anim_name_key):
     SafeSelectAndExport("CMAN00100Hero_rig","ArmatureCMAN00100","CMAN00100", anim_name_key)
 
