@@ -230,7 +230,7 @@ class MskGenerateShapeKeyBones(bpy.types.Operator):
         text = bpy.data.curves[ctr_bone_name]
         text.size = 0.03
         text.body = key_block.name
-        fontidx = bpy.data.fonts.find("Yu Gothic Regular")
+        fontidx = bpy.data.fonts.find("Yu Mincho Regular")
         text.font = bpy.data.fonts[fontidx]
 
         if bpy.data.objects.find(ctr_bone_name)==-1:
