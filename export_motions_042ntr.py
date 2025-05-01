@@ -10,7 +10,7 @@ import os
 def SafeSelectAndExport(rig_object_name, rig_name, filepath_key, anim_name_key):
     unselect_all();
     select_and(rig_object_name)
-    filepath = GetFilePath(filepath_key);
+    filepath = GetFilePath(anim_name_key);
     export_arp(filepath, rig_name, anim_name_key)
 
 
@@ -74,7 +74,7 @@ def GetFilePath(fileName):
     blendpath = bpy.data.filepath
     index = blendpath.rfind("\\")
     dir_name = blendpath[0: index+1]
-    filepath = dir_name + fileName
+    filepath = dir_name + fileName + ".fbx"
     return filepath
 
     

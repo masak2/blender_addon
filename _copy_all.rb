@@ -8,7 +8,6 @@ require $cmn_program + '/ruby/file_copy.rb'
 dstDir = "C:/Users/LMisa/AppData/Roaming/Blender Foundation/Blender/4.2/scripts/addons/masak"
 
 
-
 for filepath in  Dir::entries(".")
 
 	if File::ftype(filepath) != "file"
