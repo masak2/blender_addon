@@ -27,8 +27,6 @@ def SafeSelectAndExportEri(anim_name_key):
 def SafeSelectAndExportHero(anim_name_key):
     SafeSelectAndExport("CMAN00100_rig","ArmatureCMAN00100","CMAN00100", anim_name_key)
 
-def SafeSelectAndExportBicycle(anim_name_key):
-    SafeSelectAndExport("ArmatureBicycle","ArmatureBicycle","CMAN00300", anim_name_key)
 
 def unselect_all():
     for obj in bpy.data.objects:
@@ -68,7 +66,7 @@ def export_arp(file_output, rig_name, anim_name_key):
 # bpy.context.scene.arp_export_noparent = True
 # bpy.context.scene.arp_export_twist = True
     # export it
-    bpy.ops.id.arp_export_fbx_panel(filepath= file_output)
+    bpy.ops.arp.arp_export_fbx_panel(filepath= file_output)
 
 def GetFilePath(fileName):
     blendpath = bpy.data.filepath
