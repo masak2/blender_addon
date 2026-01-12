@@ -27,6 +27,45 @@ def SafeSelectAndExportEri(anim_name_key):
 def SafeSelectAndExportHero(anim_name_key):
     SafeSelectAndExport("CMAN00100_rig","ArmatureCMAN00100","CMAN00100", anim_name_key)
 
+def SafeSelectAndExportAyakaEri(anim_name_keyAyaka, anim_name_keyEri):
+    mute_tracks_without("CGIR00100_Kikyo_rig", anim_name_keyAyaka)
+    mute_tracks_without("CGIR00200_Eri_rig", anim_name_keyEri)
+    SafeSelectAndExportAyaka( anim_name_keyAyaka)
+    SafeSelectAndExportEri(anim_name_keyEri)
+
+def SafeSelectAndExportHeroAyaka(anim_name_keyHero,anim_name_keyAyaka):
+    mute_tracks_without("CMAN00100_rig", anim_name_keyHero)
+    mute_tracks_without("CGIR00100_Kikyo_rig", anim_name_keyAyaka)
+    SafeSelectAndExportHero(anim_name_keyHero)
+    SafeSelectAndExportAyaka( anim_name_keyAyaka)
+
+def SafeSelectAndExportHeroEri(anim_name_keyHero,anim_name_keyEri):
+    mute_tracks_without("CMAN00100_rig", anim_name_keyHero)
+    mute_tracks_without("CGIR00200_Eri_rig", anim_name_keyEri)
+    SafeSelectAndExportHero(anim_name_keyHero)
+    SafeSelectAndExportEri(anim_name_keyEri)
+
+def SafeSelectAndExportHeroAyakaEri(anim_name_keyHero,anim_name_keyAyaka,anim_name_keyEri):
+    mute_tracks_without("CMAN00100_rig", anim_name_keyHero)
+    mute_tracks_without("CGIR00100_Kikyo_rig", anim_name_keyAyaka)
+    mute_tracks_without("CGIR00200_Eri_rig", anim_name_keyEri)
+    SafeSelectAndExportHero(anim_name_keyHero)
+    SafeSelectAndExportAyaka( anim_name_keyAyaka)
+    SafeSelectAndExportEri(anim_name_keyEri)
+
+def mute_tracks_without(rig_name, track_name):
+    obj = bpy.data.objects.get(rig_name)
+
+    if not obj or obj.type != 'ARMATURE':
+        raise Exception("指定したArmatureが見つかりません")
+
+    if not obj.animation_data or not obj.animation_data.nla_tracks:
+        raise Exception("NLAトラックが存在しません")
+
+    for track in obj.animation_data.nla_tracks:
+        track.mute = (track.name != track_name)
+
+    print(f"NLA Track '{track_name}' のみ有効化しました")
 
 def unselect_all():
     for obj in bpy.data.objects:
