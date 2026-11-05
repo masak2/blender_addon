@@ -92,7 +92,7 @@ def export_arp(file_output, rig_name, anim_name_key):
     scn.arp_export_rig_name = rig_name#"ArmatureCPLA00100" 
     scn.arp_export_separate_fbx = True
     scn.arp_export_file_separator = "NONE"
-    scn.arp_only_containing = True
+    #scn.arp_only_containing = True
     scn.arp_export_name_string = anim_name_key# CGIR00100
     
     # bpy.context.scene.arp_keep_bend_bones = True
