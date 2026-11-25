@@ -11,7 +11,10 @@ def SafeSelectAndExport(rig_object_name, rig_name, filepath_key, anim_name_key):
     unselect_all();
     select_and(rig_object_name)
     filepath = GetFilePath(anim_name_key);
-    export_arp(filepath, rig_name, anim_name_key)
+    convert_axis = True
+    if filepath_key == "CMAN00400":
+        convert_axis = False
+    export_arp(filepath, rig_name, anim_name_key, convert_axis)
 
 
 def SafeSelectAndExportSonia(anim_name_key):
@@ -28,6 +31,8 @@ def SafeSelectAndExportBadGuy(anim_name_key):
     SafeSelectAndExport("CMAN00200_BadGuy_rig","ArmatureCMAN00200","CMAN00200", anim_name_key)
 def SafeSelectAndExportDQN(anim_name_key):
     SafeSelectAndExport("CMAN00300_DQN_rig","ArmatureCMAN00300","CMAN00300", anim_name_key)
+def SafeSelectAndExportSlime(anim_name_key):
+    SafeSelectAndExport("CMAN00400_Slime_rig","ArmatureCMAN00400","CMAN00400", anim_name_key)
 
 def SafeSelectAndExportSyotaSonia(anim_name_keyHero,anim_name_keyAyaka):
     mute_tracks_without("CMAN00100_Yuta_rig", anim_name_keyHero)
@@ -45,6 +50,12 @@ def SafeSelectAndExportDQNSonia(anim_name_keyHero,anim_name_keyAyaka):
     mute_tracks_without("CMAN00300_DQN_rig", anim_name_keyHero)
     mute_tracks_without("CGIR00100_Sonia_rig", anim_name_keyAyaka)
     SafeSelectAndExportDQN(anim_name_keyHero)
+    SafeSelectAndExportSonia( anim_name_keyAyaka)
+
+def SafeSelectAndExportSlimeSonia(anim_name_keyHero,anim_name_keyAyaka):
+    mute_tracks_without("CMAN00400_Slime_rig", anim_name_keyHero)
+    mute_tracks_without("CGIR00100_Sonia_rig", anim_name_keyAyaka)
+    SafeSelectAndExportSlime(anim_name_keyHero)
     SafeSelectAndExportSonia( anim_name_keyAyaka)
 
 def mute_tracks_without(rig_name, track_name):
@@ -72,7 +83,7 @@ def select_and(objname):
     bpy.context.view_layer.objects.active = obj
 
 
-def export_arp(file_output, rig_name, anim_name_key):
+def export_arp(file_output, rig_name, anim_name_key, convert_axis):
     # set the file path output here
     # set some settings...
     scn = bpy.context.scene
@@ -88,6 +99,7 @@ def export_arp(file_output, rig_name, anim_name_key):
     scn.arp_export_file_separator = "NONE"
     #scn.arp_only_containing = True
     scn.arp_export_name_string = anim_name_key# CGIR00100
+    scn.arp_init_fbx_rot = convert_axis
     
     # bpy.context.scene.arp_keep_bend_bones = True
 # bpy.context.scene.arp_units_x100 = True
